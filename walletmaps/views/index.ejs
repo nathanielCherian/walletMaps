@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.js"
+      integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"></script>
+
+  </head>
+
+  <body>
+    <h1><%= title %></h1>
+
+    <input type="text" placeholder="bch address">
+
+  </body>
+
+
+  <script>
+
+
+    async function makeGETRequest(url){
+
+      const response = await fetch(url);
+      return await response.json();
+    }
+
+
+    async function getTXsfromAddr(addr){
+      const data = await makeGETRequest(`https://explorer.api.bitcoin.com/bch/v1/addr/${addr}?from=0&to=1000&noTxList=0`)
+      return data.transactions
+    }
+
+  
+    async function getAddrsfromTX(tx){
+      const data = await makeGETRequest(`https://explorer.api.bitcoin.com/bch/v1/tx/${tx}`)
+      
+      const inAddrs = [];
+      for(a of data.vin){
+        inAddrs.push([a.addr, a.value]);
+      }
+
+
+      const outAddrs = [];
+      for(a of data.vout){
+        outAddrs.push([a.scriptPubKey.addresses[0], a.value]);
+      }
+      
+      return {in: inAddrs, out:outAddrs};
+    }
+
+
+    async function main(){
+      //const data = await makeGETRequest("https://explorer.api.bitcoin.com/bch/v1/addr/qpesy70d3kvdr4799adpp8nxgke55xpxhu0jd7w6dh?from=0&to=1000&noTxList=0")
+      //console.log(data)
+      const txs = await getTXsfromAddr('qpesy70d3kvdr4799adpp8nxgke55xpxhu0jd7w6dh')
+      console.log(txs)
+
+      console.log(await getAddrsfromTX(txs[0]))
+      /*
+      txs.forEach(tx => {
+          console.log(await getAddrsfromTX(tx));
+      });
+      */
+    }
+
+
+    main();
+
+  </script>
+
+
+</html>
