@@ -8,6 +8,7 @@
       integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
       crossorigin="anonymous"></script>
 
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/two.js/0.7.1/two.min.js" integrity="sha512-ptawfQ2Of4pvSSfVhmF6rT7gH95OI225ZWPwripfxX1qfCnp+YmGYUQjP9akXijjxguKFaTjw26pAVtHak86SA==" crossorigin="anonymous"></script>
   </head>
 
   <body>
@@ -15,14 +16,125 @@
 
     <input type="text" placeholder="bch address">
 
+    <div id="draw-animation"></div>
+
+
   </body>
 
 
   <script>
 
+    var elem = document.getElementById('draw-animation');
+    const width = 1000, height=700;
+    var two = new Two({ fullscreen: false, width:width, height:height }).appendTo(elem);
+    var styles = {
+      size: 18,
+      family: 'Lato'
+    } 
+
+    const center = [width/2, height/2];
+
+
+
+    var selected = null;
+    class Address{
+      constructor(addr){
+        this.addr = addr
+        this.connections = []
+
+        this.createCircle(...center);
+      }
+
+      draw(){
+        
+      }
+
+
+      createCircle(x, y){
+        var circA = two.makeCircle(x, y, 50);
+        this.shape = circA;
+        circA.fill = 'red';
+        circA.noStroke();
+        two.update();
+
+        const me = this;
+
+        circA._renderer.elem.addEventListener('mousedown', function(event){
+          selected=me;
+          console.log(event);
+        }, false);
+
+        circA._renderer.elem.addEventListener('mouseup', function(event){
+          selected=null;
+          console.log(event);
+        }, false);
+      }
+
+
+      createConnection(x1,y1){
+        const shape = two.makeLine(x1,y1,this.shape.translation.x, this.shape.translation.y);
+        this.connections.push(shape);
+        two.update()
+      }
+
+      translateConnections(dx, dy){
+        this.connections.forEach(connection => {
+            console.log(connection.translation.x1)
+
+            connection.translation.x += dx;
+            connection.translation.y += dy;
+        });
+
+        two.update();
+      }
+
+
+    }
+
+
+    const a = new Address();
+    a.createConnection(0,0)
+    
+    const position = {x:0, y:0}
+    var f = true;
+    window.addEventListener('mousemove', function(event){
+      
+      if(f){
+        position.x = event.clientX;
+        position.y = event.clientY;
+        f = false;
+        return;
+      }
+
+
+      if(selected != null){
+
+        const dx = event.clientX- position.x;
+        const dy = event.clientY- position.y
+
+        selected.shape.translation.x += dx;
+        selected.shape.translation.y += dy;
+
+        selected.translateConnections(dx, dy);
+
+        two.update();
+      }
+
+      position.x = event.clientX;
+      position.y = event.clientY;
+
+
+    });
+    
+    window.addEventListener('mouseup', function(event){
+      selected=null;
+    });
+
+
+
+
 
     async function makeGETRequest(url){
-
       const response = await fetch(url);
       return await response.json();
     }
@@ -38,13 +150,13 @@
       const data = await makeGETRequest(`https://explorer.api.bitcoin.com/bch/v1/tx/${tx}`)
       
       const inAddrs = [];
-      for(a of data.vin){
+      for(const a of data.vin){
         inAddrs.push([a.addr, a.value]);
       }
 
 
       const outAddrs = [];
-      for(a of data.vout){
+      for(const a of data.vout){
         outAddrs.push([a.scriptPubKey.addresses[0], a.value]);
       }
       
@@ -53,8 +165,7 @@
 
 
     async function main(){
-      //const data = await makeGETRequest("https://explorer.api.bitcoin.com/bch/v1/addr/qpesy70d3kvdr4799adpp8nxgke55xpxhu0jd7w6dh?from=0&to=1000&noTxList=0")
-      //console.log(data)
+
       const txs = await getTXsfromAddr('qpesy70d3kvdr4799adpp8nxgke55xpxhu0jd7w6dh')
       console.log(txs)
 
