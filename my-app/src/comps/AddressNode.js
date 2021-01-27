@@ -9,12 +9,13 @@ export default class AddressNode extends Component{
     }
 
 
-    handleDrag(event){
-        console.log(event)
+
+    handleDrag = event =>{
+        this.props.onDrag(event)
+        //console.log(event)
     }
 
     render(){
-
         
         const style = {
             top: "50%",
@@ -24,10 +25,11 @@ export default class AddressNode extends Component{
             cursor: "grab",
         }
 
+        const cn = "box addr-node " + this.props.addr;
 
         return(
-            <Draggable onDrag={this.handleDrag}  defaultPosition={this.props.defaultPosition}>
-                <div className="box addr-node" id={this.props.addr} style={style}></div>
+            <Draggable onDrag={this.handleDrag} defaultPosition={this.props.defaultPosition}>
+                <div className={cn} id={this.props.addr} style={style}></div>
             </Draggable>
         )
     }

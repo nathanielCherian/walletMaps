@@ -15,8 +15,8 @@ export default class ConnectingLine extends Component{
         }*/
     }
 
+    
     render(){
-
         return(
             <svg width="500" height="500"><line x1={this.props.position.x1} y1={this.props.position.y1} x2={this.props.position.x2} y2={this.props.position.y2} stroke="black"/></svg>
         );
