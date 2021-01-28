@@ -7,7 +7,7 @@ export default class SearchInput extends Component{
     }
 
     onKeyPress = event => {
-        if(event.charCode == 13){
+        if(event.charCode === 13){
             this.props.onSubmit(document.getElementById('addr-search').value);
         }
     }
