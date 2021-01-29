@@ -4,45 +4,62 @@ import Node from "./Node";
 
 export default class Connections{
 
-    constructor({updateParent}){
+    constructor({updateParent, onDoubleClick}){
 
         this.updateParent = updateParent;
+        this.onDoubleClick = onDoubleClick;
 
         this.connections = [];
         this.nodes = {}
 
+    }
 
-        this.addressRegistry = {}
-        this.connectionList = []
+
+    setMapFromResponse(response){
+
+        Object.keys(response).map(tx=>{
+            const block = response[tx];
+
+            Object.keys(block.from).map(fromAddr=>{
+                this.createNode(fromAddr);
+                Object.keys(block.to).map(toAddr=>{
+                    this.createNode(toAddr);
+                    this.createConnection(tx, fromAddr, toAddr);
+                });
+            });
+
+        });
 
     }
 
 
 
+
     createNode(addr){
+        if(addr in this.nodes) return false;
         this.nodes[addr] = {
             addr:addr,
             balance:null
         }
         return
     }
-
     getNodes(){
         return Object.keys(this.nodes).map(key=>{
-            return <Node addr={this.nodes[key].addr} updateParent={this.updateParent}/>
+            return <Node addr={this.nodes[key].addr} updateParent={this.updateParent} onDoubleClick={this.onDoubleClick}/>
         });
     }
 
 
-    createConnection(from, to){
+    createConnection(txid, from, to){
         this.connections.push({
+            txid:txid,
             from:from,
             to:to
         })
     }
     getLines(){
         return this.connections.map((connection) => {
-            return <LineTo from={connection.from} to={connection.to} delay={true}/>
+            return <LineTo from={connection.from} to={connection.to} className={connection.txid} delay={true}/>
         });
     }
 

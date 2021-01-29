@@ -11,38 +11,44 @@ export default class Body extends PureComponent{
         this.baseAddress = props.baseAddress;
     
         this.update = this.update.bind(this);
-
-        this.connections = new Connections({updateParent:this.update});
+        this.searchByAddr = this.searchByAddr.bind(this);
+            
+        this.connections = new Connections({updateParent:this.update, onDoubleClick:this.searchByAddr});
 
         this.connections.createNode(this.baseAddress);
 
-        /*
-        .then(response=>{
-            console.log("poo")
-            console.log(response)
-        });
 
-        /*
+        /*        
         this.connections.createNode("to");
         this.connections.createNode("poo");
 
 
-        this.connections.createConnection(this.baseAddress, "to");
-        this.connections.createConnection(this.baseAddress, "poo");
-        this.connections.createConnection("poo", "to");
+        this.connections.createConnection("asdasd", this.baseAddress, "to");
+        this.connections.createConnection("2", this.baseAddress, "poo");
+        this.connections.createConnection("234", "poo", "to");
+        
         */
+
 
     }
 
 
     componentDidMount(){
-        this.lookup(this.baseAddress);
+        //this.lookup(this.baseAddress);
+    }
+
+
+    searchByAddr(addr){
+        console.log(addr);
+        this.lookup(addr);
     }
 
     
     lookup(addr){
         DataLookup.getNodesFromAddr(addr).then(response=>{
             console.log(response)
+            this.connections.setMapFromResponse(response)
+            this.update();
         });
     }
 
@@ -53,10 +59,6 @@ export default class Body extends PureComponent{
 
 
     render(){
-        /*
-                        <Node addr={this.baseAddress} updateParent={this.update}/>
-                <Node addr={"to"} updateParent={this.update}/>
-                */
 
         return(
             <div>

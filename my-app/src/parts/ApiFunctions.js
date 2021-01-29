@@ -35,91 +35,68 @@ export default class DataLookup{
     }
 
 
-    static async getPoofromAddr(addr){
-
-      const txs = await this.getTXfromAddr(addr);
-
-
-      const data = [];
-
-      for(const tx of txs){
-        const txData = await this.getAddrfromTX(tx);
-
-        var FROM = null;
-        var TO = null;
-        for(const block of txData.in){
-          if(block[0] == addr){
-            FROM = block
-            break;
-          }
-        }
-
-        if(FROM){
-          TO = txData.out;
-        }else{
-          FROM = txData.in;
-          for(const block of txData.out){
-            if(block[0] == addr){
-              TO = [block,];
-              break;
-            }
-          }
-        }
-
-
-        data.push({
-          txid:tx,
-          from:FROM,
-          to:TO
-        });
-      }
-
-      return data
-    }
-
-
-
     static async getNodesFromAddr(addr){
 
       const txs = await this.getTXfromAddr(addr);
 
-      const newData = {}
+      const allData = {}
 
 
       for(const tx of txs){
-        const returnData = {};
         const data = await this.getDatafromTX(tx)
 
-        var SENDER = false;
+        const txData = {}
 
-        data.vin.map(b=>{
-          if(b.addr == addr){
-            newData["from"] = [b.addr, b.value];
-            SENDER = true;
+        {
+          const dta = {};
+          data.vin.map(block=>{
+            dta[block.addr] = {
+              value:block.value,
+            };
+          });
+
+          txData['in'] = dta;
+        }
+
+
+        {
+          const dta = {};
+          data.vout.map(block=>{
+            dta[block.scriptPubKey.addresses[0]] = {
+              value:block.value,
+            };
+          });
+
+          txData['out'] = dta;
+        }
+
+        
+        //Check transaction relation to base node
+        if(Object.keys(txData.in).includes(addr)){ //sending to multiple
+          console.log("in");
+          allData[tx] = {
+            from:{[addr]:txData.in[addr]},
+            to:txData.out
           }
-        });
+          
+        } else if(Object.keys(txData.out).includes(addr)){ //replace with else later // reveing from multiple
+          console.log("out");
+          allData[tx] = {
+            from: txData.in,
+            to:{[addr]:txData.out[addr]}
+          }
 
-        console.log(data.vout)
-
-        if(SENDER){
-          newData["to"] = data.out;
-        }else{
-          newData["from"] = data.vin
         }
 
       }
 
 
-      return newData
 
-
-      /*
-      return fetch('https://explorer.api.bitcoin.com/bch/v1/addr/1BV7g7hcMDGJYF1CkeUzcgqF2WbJruz7Jk?from=0&to=1000&noTxList=0')
-        .then(response=>{
-          return response.json();
-        }).catch(error => console.warn(error));
-        */
+      return allData;
     }
+
+
+
 
 
 }
