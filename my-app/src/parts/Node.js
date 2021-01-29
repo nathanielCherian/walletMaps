@@ -16,11 +16,19 @@ export default class Node extends PureComponent{
         this.props.onDoubleClick(this.addr);
     };  
 
+    onClick = event =>{
+        this.props.onClick({
+            addr:this.addr
+        });
+    }
+
     
     render(){
 
         const nodeProps = {
-            className:"node box " + this.props.addr
+            className:"node box " + this.props.addr,
+            onDoubleClick: this.onDoubleClick,
+            onClick:this.onClick
         }
 
         const draggableProps = {
@@ -29,8 +37,7 @@ export default class Node extends PureComponent{
 
         return(
             <Draggable {...draggableProps} onDrag={this.props.updateParent}>
-                <div {...nodeProps} onDoubleClick={this.onDoubleClick}></div>
-        
+                <div {...nodeProps} on></div>
             </Draggable>
         )
     }

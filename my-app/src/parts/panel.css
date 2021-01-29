@@ -1,0 +1,16 @@
+.panel{
+    background-color: rgb(199, 199, 199);
+    width: 500px;
+    height: 700px;
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    border-radius: 30px;
+    z-index: 101;
+    box-shadow: 5px 5px rgb(187, 178, 178);
+    text-align: center;
+}
+
+.panel-body{
+    margin: 5%;
+}

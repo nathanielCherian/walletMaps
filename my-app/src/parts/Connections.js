@@ -4,10 +4,11 @@ import Node from "./Node";
 
 export default class Connections{
 
-    constructor({updateParent, onDoubleClick}){
+    constructor({updateParent, onDoubleClick, onClick}){
 
         this.updateParent = updateParent;
         this.onDoubleClick = onDoubleClick;
+        this.onClick = onClick;
 
         this.connections = [];
         this.nodes = {}
@@ -45,7 +46,7 @@ export default class Connections{
     }
     getNodes(){
         return Object.keys(this.nodes).map(key=>{
-            return <Node addr={this.nodes[key].addr} updateParent={this.updateParent} onDoubleClick={this.onDoubleClick}/>
+            return <Node addr={this.nodes[key].addr} updateParent={this.updateParent} onDoubleClick={this.onDoubleClick} onClick={this.onClick}/>
         });
     }
 

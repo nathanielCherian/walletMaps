@@ -2,6 +2,7 @@ import { PureComponent } from "react";
 import Connections from "./Connections";
 import DataLookup from "./ApiFunctions";
 import Node from "./Node"
+import Panel from "./Panel";
 
 export default class Body extends PureComponent{
 
@@ -12,29 +13,33 @@ export default class Body extends PureComponent{
     
         this.update = this.update.bind(this);
         this.searchByAddr = this.searchByAddr.bind(this);
-            
-        this.connections = new Connections({updateParent:this.update, onDoubleClick:this.searchByAddr});
+        this.nodeClicked = this.nodeClicked.bind(this)
+        this.nodeUnclicked = this.nodeUnclicked.bind(this);
+
+        this.connections = new Connections({updateParent:this.update, onDoubleClick:this.searchByAddr, onClick:this.nodeClicked});
 
         this.connections.createNode(this.baseAddress);
 
-
-        /*        
-        this.connections.createNode("to");
-        this.connections.createNode("poo");
-
-
-        this.connections.createConnection("asdasd", this.baseAddress, "to");
-        this.connections.createConnection("2", this.baseAddress, "poo");
-        this.connections.createConnection("234", "poo", "to");
-        
-        */
-
+        this.state = {
+            panelVisible:false,
+            panelData:{}
+        }
 
     }
 
 
     componentDidMount(){
-        //this.lookup(this.baseAddress);
+        window.addEventListener('click', this.nodeUnclicked);
+    }
+
+    nodeClicked(data){
+        this.setState({panelVisible:true, panelData:data});
+    }
+
+    nodeUnclicked(event){
+        if(event.target.nodeName == "HTML"){
+            this.setState({panelVisible:false});
+        }
     }
 
 
@@ -62,8 +67,12 @@ export default class Body extends PureComponent{
 
         return(
             <div>
-                {this.connections.getNodes()}
-                {this.connections.getLines()}
+                <div>
+                    {this.connections.getNodes()}
+                    {this.connections.getLines()}
+                </div>
+
+                <Panel visible={this.state.panelVisible} panelData={this.state.panelData} />
             </div>
         )
     }
