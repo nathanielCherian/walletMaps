@@ -1,0 +1,13 @@
+.node{
+    width: 70px;
+    height: 70px;
+    background-color: gray;
+    border-radius: 50%;
+    cursor: grab;
+    z-index: 100;
+}
+
+.box{
+    position: fixed;
+    z-index: 100;
+}

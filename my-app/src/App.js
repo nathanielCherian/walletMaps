@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Map from './comps/Map';
 import DataLookup from './comps/ApiFunctions';
 import SearchInput from "./comps/SearchInput";
+import Body from './parts/Body';
 
 export default class App extends Component{
 
@@ -31,7 +32,7 @@ export default class App extends Component{
 
 
 
-  
+/*
   render(){
     return(
       <div>
@@ -40,6 +41,25 @@ export default class App extends Component{
       </div>
     );
   }
+
+*/
+
+  render(){
+
+    const bodyProps = {
+      baseAddress:"1BV7g7hcMDGJYF1CkeUzcgqF2WbJruz7Jk",
+    }
+
+    return(
+      <div>
+          <SearchInput onSubmit={this.searchAddr}/>
+          <Body {...bodyProps} />
+      </div>
+
+    )
+  }
+
+
 
 }
 
